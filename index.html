@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrueYou: End-to-End 3D Simulation Pipeline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #f8fafc; /* slate-50 */
+            --bg-dark: #020617; /* slate-950 */
+            --text-light: #1e293b; /* slate-800 */
+            --text-dark: #e2e8f0; /* slate-200 */
+            --card-bg-light: #ffffff;
+            --card-bg-dark: #0f172a; /* slate-900 */
+            --border-light: #e2e8f0; /* slate-200 */
+            --border-dark: #334155; /* slate-700 */
+            --line-light: #cbd5e1; /* slate-300 */
+            --line-dark: #475569; /* slate-600 */
+        }
+        html.dark {
+            --bg-light: var(--bg-dark);
+            --text-light: var(--text-dark);
+            --card-bg-light: var(--card-bg-dark);
+            --border-light: var(--border-dark);
+            --line-light: var(--line-dark);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .pipeline-card {
+            background-color: var(--card-bg-light);
+            border: 1px solid var(--border-light);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .pipeline-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        }
+        
+        .pipeline-item {
+            position: relative;
+            padding-left: 3rem; /* Space for icon and line */
+        }
+        .pipeline-line {
+            position: absolute;
+            left: 20px; /* Aligns with center of icon */
+            top: 44px; /* Start below the icon */
+            bottom: -1rem;
+            width: 2px;
+            background-color: var(--line-light);
+        }
+        .pipeline-item:last-child .pipeline-line {
+            display: none;
+        }
+        .pipeline-icon {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            border: 2px solid var(--line-light);
+            background-color: var(--card-bg-light);
+            transition: all 0.3s ease;
+        }
+        .pipeline-item.visible .pipeline-icon {
+            transform: scale(1.1);
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .special-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            margin-right: 0.25rem;
+        }
+        .phase-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold leading-tight text-slate-900 dark:text-white">TrueYou Pipeline</h1>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">End-to-End 3D Simulation Architecture</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button id="download-csv" class="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none" title="Download as CSV">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                    </button>
+                    <button id="theme-toggle" class="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none" title="Toggle Dark Mode">
+                        <svg id="theme-icon-light" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                        <svg id="theme-icon-dark" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+        <section id="pipeline-overview" class="text-center mb-16">
+            <h2 class="text-4xl font-extrabold text-slate-900 dark:text-white sm:text-5xl reveal">3D Face Simulation Pipeline</h2>
+            <p class="mt-6 max-w-3xl mx-auto text-lg text-slate-600 dark:text-slate-300 reveal" style="transition-delay: 100ms;">A detailed, stage-by-stage overview of the architecture powering our next-generation cosmetic surgery visualization tool.</p>
+        </section>
+
+        <section id="pipeline-stages">
+            <div class="space-y-8">
+                <!-- Dynamically generated pipeline stages will go here -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white dark:bg-slate-900 mt-24 border-t border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-slate-500 dark:text-slate-400">
+            <p>&copy; 2025 KARMICVERSE LLC. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const pipelineData = [
+            { stage: 1, title: 'Image Upload & Intake', input: 'Frontal & profile facial photos', output: 'Uploaded, validated images', tools: 'Gradio, FastAPI, OpenCV', models: '—', component: 'Frontend, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>', feasibility: '✅ Ready', backup: 'Gradio file uploader, basic checks', effort: '💪 Easy', phase: '✅ PoC' },
+            { stage: 2, title: 'Image Preprocessing', input: 'Raw images', output: 'Aligned, standardized images', tools: 'OpenCV, Pillow, SciPy, NumPy, face-alignment', models: '—', component: 'Backend, Model', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>', feasibility: '✅ Ready', backup: 'DECA auto-alignment fallback', effort: '⚙️ Moderate', phase: '✅ PoC' },
+            { stage: 3, title: 'Clinical Parameter Integration', input: 'Manual inputs or JSON (e.g., nasion, alar width)', output: 'Parameter schema mapped to facial regions', tools: 'JSON schema, Gradio/Streamlit sliders', models: '—', component: 'Frontend, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>', feasibility: '🟡 Needs Planning', backup: 'Use preset values or omit UI sliders', effort: '⚙️ Moderate', phase: '🧪 MVP' },
+            { stage: 4, title: '3D Face Reconstruction', input: 'Aligned frontal/profile images', output: '3D face mesh (OBJ/PLY) + UV texture map', tools: 'PyTorch, PyTorch3D, FLAME, face-alignment, Trimesh', models: '✅ DECA (preferred), EMOCA, 3DMM-CNN', component: 'Model, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3m-9 9h18" /></svg>', feasibility: '✅ Solid', backup: '3DMM-CNN fallback', effort: '⚙️ Moderate', phase: '✅ PoC' },
+            { stage: 5, title: 'Mesh-Based Surgical Simulation', input: '3D mesh + surgical intent (text or param)', output: 'Modified 3D mesh (post-surgery simulation)', tools: 'PyTorch3D, CLIP, MeshCNN, latent vector ops', models: '✅ Text2Mesh, 🌀 3D-CODED, 🧠 Custom deformation models', component: 'Model, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>', feasibility: '🟡 Tricky but doable', backup: 'Predefined deformations or slider presets', effort: '🧱 Hard', phase: '✅ PoC (Basic), 🧪 MVP (Advanced)' },
+            { stage: 6, title: 'Texture Mapping & Enhancement', input: 'Base mesh (or scanned textures)', output: 'Realistic textured mesh', tools: 'PyTorch3D UV tools, Blender (optional), Neural Texture Projection', models: 'DECA (detail branch), UV completion GAN (optional)', component: 'Model, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>', feasibility: '✅ DECA provides UV map', backup: 'Use gray mesh or basic shading if needed', effort: '⚙️ Moderate', phase: '✅ PoC' },
+            { stage: 7, title: '3D Viewer (Before/After toggle)', input: 'Original + modified 3D mesh & texture', output: 'Interactive 3D viewer (rotate, zoom, compare)', tools: 'Three.js, React (future), Gradio (demo)', models: '—', component: 'Frontend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>', feasibility: '✅ Gradio supports Model3D', backup: 'Export .GLB + Sketchfab embed', effort: '💪 Easy', phase: '✅ PoC' },
+            { stage: 8, title: 'Before/After Comparison UX', input: 'Original + modified 3D mesh', output: 'Interactive side-by-side or slider view', tools: 'Gradio, Three.js', models: '—', component: 'Frontend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>', feasibility: '✅ Easy in Gradio', backup: 'Use side-by-side viewer or image comparison', effort: '💪 Easy', phase: '✅ PoC' },
+            { stage: 9, title: 'Facial Measurement Analytics', input: 'Mesh geometry, measurements', output: 'Before/after comparisons, downloadable metrics', tools: 'SciPy, Pandas, Matplotlib/Plotly, JSON/CSV export', models: '—', component: 'Backend, Frontend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>', feasibility: '🟡 Needs clinical logic', backup: 'Add later using landmarks and ratios', effort: '⚙️ Moderate', phase: '🔁 Deferred' },
+            { stage: 10, title: 'Exporting Mesh & Screenshots', input: 'Final simulated mesh', output: 'Exportable .OBJ, .GLTF, screenshots', tools: 'PyTorch3D I/O, GLTF export, Screenshot API', models: '—', component: 'Frontend, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>', feasibility: '✅ Straightforward', backup: 'Provide .OBJ + download link', effort: '💪 Easy', phase: '✅ PoC' },
+            { stage: 11, title: 'Infrastructure & GPU Hosting', input: 'App code, model weights', output: 'Live webapp with GPU support, secure uploads', tools: 'GCP/AWS, Docker, HTTPS, Vertex AI (optional), HIPAA/GDPR compliance', models: '—', component: 'Infra', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" /></svg>', feasibility: '🟡 Plan GPU access', backup: 'Use GCP, Colab, or run batch-mode', effort: '⚙️ Moderate', phase: '✅ PoC' },
+        ];
+
+        function createModelBadge(modelText) {
+            const badges = { '✅': 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300', '🌀': 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300', '🧠': 'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300' };
+            const emoji = modelText.trim().charAt(0);
+            return badges[emoji] ? `<div class="inline-flex items-center"><span class="special-badge ${badges[emoji]}">${emoji}</span><span>${modelText.substring(1).trim()}</span></div>` : `<span>${modelText}</span>`;
+        }
+
+        function createPhaseTag(phaseText) {
+            const pocTag = `<span class="phase-tag bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300">PoC</span>`;
+            const mvpTag = `<span class="phase-tag bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">MVP</span>`;
+            const deferredTag = `<span class="phase-tag bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">Deferred</span>`;
+            let tags = '';
+            if (phaseText.includes('PoC')) tags += pocTag;
+            if (phaseText.includes('MVP')) tags += ` ${mvpTag}`;
+            if (phaseText.includes('Deferred')) tags += ` ${deferredTag}`;
+            return tags.trim();
+        }
+
+        const pipelineContainer = document.querySelector('#pipeline-stages .space-y-8');
+        pipelineData.forEach((item, index) => {
+            const modelsHtml = item.models.split(',').map(m => createModelBadge(m.trim())).join('<br>');
+            const phaseHtml = createPhaseTag(item.phase);
+            
+            const cardHtml = `
+                <div class="pipeline-item reveal" style="transition-delay: ${index * 100}ms;">
+                    <div class="pipeline-line"></div>
+                    <div class="pipeline-icon text-blue-500">${item.icon}</div>
+                    <div class="pipeline-card rounded-xl shadow-lg overflow-hidden">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">${item.stage}. ${item.title}</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                                <div class="flex items-start"><span class="font-semibold text-slate-500 dark:text-slate-400 w-20">Input:</span><span class="flex-1">${item.input}</span></div>
+                                <div class="flex items-start"><span class="font-semibold text-slate-500 dark:text-slate-400 w-20">Output:</span><span class="flex-1 text-green-600 dark:text-green-400 font-medium">${item.output}</span></div>
+                                <div class="flex items-start"><span class="font-semibold text-slate-500 dark:text-slate-400 w-20">Tools:</span><span class="flex-1">${item.tools}</span></div>
+                                <div class="flex items-start"><span class="font-semibold text-slate-500 dark:text-slate-400 w-20">Models:</span><div class="flex-1">${modelsHtml}</div></div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-t border-slate-200 dark:border-slate-700 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                            <div>
+                                <div class="font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">Feasibility</div>
+                                <div class="font-semibold text-slate-700 dark:text-slate-300">${item.feasibility}</div>
+                            </div>
+                            <div>
+                                <div class="font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">Effort</div>
+                                <div class="font-semibold text-slate-700 dark:text-slate-300">${item.effort}</div>
+                            </div>
+                            <div class="col-span-2 md:col-span-1">
+                                <div class="font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">Phase</div>
+                                <div class="font-semibold">${phaseHtml}</div>
+                            </div>
+                            <div class="col-span-2 md:col-span-1">
+                                <div class="font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">Backup</div>
+                                <div class="font-semibold text-slate-700 dark:text-slate-300">${item.backup}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            pipelineContainer.innerHTML += cardHtml;
+        });
+
+        // Dark Mode Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const lightIcon = document.getElementById('theme-icon-light');
+        const darkIcon = document.getElementById('theme-icon-dark');
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            lightIcon.classList.remove('hidden'); darkIcon.classList.add('hidden');
+        } else {
+            lightIcon.classList.add('hidden'); darkIcon.classList.remove('hidden');
+        }
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            lightIcon.classList.toggle('hidden'); darkIcon.classList.toggle('hidden');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+        
+        // CSV Download
+        document.getElementById('download-csv').addEventListener('click', () => {
+            const headers = ['Stage', 'Title', 'Feasibility', 'Backup Strategy', 'Effort', 'Phase', 'Input', 'Output', 'Tools', 'Models', 'Component'];
+            const replacer = (key, value) => value === null ? '' : value;
+            const csv = [
+                headers.join(','),
+                ...pipelineData.map(row => headers.map(fieldName => {
+                    const key = fieldName.toLowerCase().replace(' ', '');
+                    return JSON.stringify(row[key], replacer)
+                }).join(','))
+            ].join('\r\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'TrueYou_Pipeline_Details.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+
+        // Scroll Animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>
