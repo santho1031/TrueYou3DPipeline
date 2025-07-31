@@ -108,6 +108,32 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
+        .risk-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        .tab-btn {
+            border-bottom: 3px solid transparent;
+            padding-bottom: 0.5rem;
+            font-weight: 600;
+            color: #64748b; /* slate-500 */
+        }
+        html.dark .tab-btn {
+             color: #94a3b8; /* slate-400 */
+        }
+        .tab-btn.active-tab {
+            border-color: #3b82f6; /* blue-500 */
+            color: #3b82f6;
+        }
+        html.dark .tab-btn.active-tab {
+            color: #60a5fa; /* blue-400 */
+        }
+        .tab-panel.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -118,7 +144,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-2xl font-bold leading-tight text-slate-900 dark:text-white">TrueYou Pipeline</h1>
-                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">End-to-End 3D Simulation Architecture</p>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">End-to-End 3D Simulation Architecture & Feasibility</p>
                 </div>
                 <div class="flex items-center gap-4">
                     <button id="download-csv" class="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none" title="Download as CSV">
@@ -138,7 +164,7 @@
     <main class="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
         <section id="pipeline-overview" class="text-center mb-16">
             <h2 class="text-4xl font-extrabold text-slate-900 dark:text-white sm:text-5xl reveal">3D Face Simulation Pipeline</h2>
-            <p class="mt-6 max-w-3xl mx-auto text-lg text-slate-600 dark:text-slate-300 reveal" style="transition-delay: 100ms;">A detailed, stage-by-stage overview of the architecture powering our next-generation cosmetic surgery visualization tool.</p>
+            <p class="mt-6 max-w-3xl mx-auto text-lg text-slate-600 dark:text-slate-300 reveal" style="transition-delay: 100ms;">A detailed, stage-by-stage overview of the architecture powering our next-generation cosmetic surgery visualization tool, including feasibility analysis.</p>
         </section>
 
         <section id="pipeline-stages">
@@ -156,23 +182,36 @@
 
     <script>
         const pipelineData = [
-            { stage: 1, title: 'Image Upload & Intake', input: 'Frontal & profile facial photos', output: 'Uploaded, validated images', tools: 'Gradio, FastAPI, OpenCV', models: '—', component: 'Frontend, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>', feasibility: '✅ Ready', backup: 'Gradio file uploader, basic checks', effort: '💪 Easy', phase: '✅ PoC' },
-            { stage: 2, title: 'Image Preprocessing', input: 'Raw images', output: 'Aligned, standardized images', tools: 'OpenCV, Pillow, SciPy, NumPy, face-alignment', models: '—', component: 'Backend, Model', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>', feasibility: '✅ Ready', backup: 'DECA auto-alignment fallback', effort: '⚙️ Moderate', phase: '✅ PoC' },
-            { stage: 3, title: 'Clinical Parameter Integration', input: 'Manual inputs or JSON (e.g., nasion, alar width)', output: 'Parameter schema mapped to facial regions', tools: 'JSON schema, Gradio/Streamlit sliders', models: '—', component: 'Frontend, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>', feasibility: '🟡 Needs Planning', backup: 'Use preset values or omit UI sliders', effort: '⚙️ Moderate', phase: '🧪 MVP' },
-            { stage: 4, title: '3D Face Reconstruction', input: 'Aligned frontal/profile images', output: '3D face mesh (OBJ/PLY) + UV texture map', tools: 'PyTorch, PyTorch3D, FLAME, face-alignment, Trimesh', models: '✅ DECA (preferred), EMOCA, 3DMM-CNN', component: 'Model, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3m-9 9h18" /></svg>', feasibility: '✅ Solid', backup: '3DMM-CNN fallback', effort: '⚙️ Moderate', phase: '✅ PoC' },
-            { stage: 5, title: 'Mesh-Based Surgical Simulation', input: '3D mesh + surgical intent (text or param)', output: 'Modified 3D mesh (post-surgery simulation)', tools: 'PyTorch3D, CLIP, MeshCNN, latent vector ops', models: '✅ Text2Mesh, 🌀 3D-CODED, 🧠 Custom deformation models', component: 'Model, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>', feasibility: '🟡 Tricky but doable', backup: 'Predefined deformations or slider presets', effort: '🧱 Hard', phase: '✅ PoC (Basic), 🧪 MVP (Advanced)' },
-            { stage: 6, title: 'Texture Mapping & Enhancement', input: 'Base mesh (or scanned textures)', output: 'Realistic textured mesh', tools: 'PyTorch3D UV tools, Blender (optional), Neural Texture Projection', models: 'DECA (detail branch), UV completion GAN (optional)', component: 'Model, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>', feasibility: '✅ DECA provides UV map', backup: 'Use gray mesh or basic shading if needed', effort: '⚙️ Moderate', phase: '✅ PoC' },
-            { stage: 7, title: '3D Viewer (Before/After toggle)', input: 'Original + modified 3D mesh & texture', output: 'Interactive 3D viewer (rotate, zoom, compare)', tools: 'Three.js, React (future), Gradio (demo)', models: '—', component: 'Frontend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>', feasibility: '✅ Gradio supports Model3D', backup: 'Export .GLB + Sketchfab embed', effort: '💪 Easy', phase: '✅ PoC' },
-            { stage: 8, title: 'Before/After Comparison UX', input: 'Original + modified 3D mesh', output: 'Interactive side-by-side or slider view', tools: 'Gradio, Three.js', models: '—', component: 'Frontend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>', feasibility: '✅ Easy in Gradio', backup: 'Use side-by-side viewer or image comparison', effort: '💪 Easy', phase: '✅ PoC' },
-            { stage: 9, title: 'Facial Measurement Analytics', input: 'Mesh geometry, measurements', output: 'Before/after comparisons, downloadable metrics', tools: 'SciPy, Pandas, Matplotlib/Plotly, JSON/CSV export', models: '—', component: 'Backend, Frontend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>', feasibility: '🟡 Needs clinical logic', backup: 'Add later using landmarks and ratios', effort: '⚙️ Moderate', phase: '🔁 Deferred' },
-            { stage: 10, title: 'Exporting Mesh & Screenshots', input: 'Final simulated mesh', output: 'Exportable .OBJ, .GLTF, screenshots', tools: 'PyTorch3D I/O, GLTF export, Screenshot API', models: '—', component: 'Frontend, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>', feasibility: '✅ Straightforward', backup: 'Provide .OBJ + download link', effort: '💪 Easy', phase: '✅ PoC' },
-            { stage: 11, title: 'Infrastructure & GPU Hosting', input: 'App code, model weights', output: 'Live webapp with GPU support, secure uploads', tools: 'GCP/AWS, Docker, HTTPS, Vertex AI (optional), HIPAA/GDPR compliance', models: '—', component: 'Infra', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" /></svg>', feasibility: '🟡 Plan GPU access', backup: 'Use GCP, Colab, or run batch-mode', effort: '⚙️ Moderate', phase: '✅ PoC' },
+            { stage: 1, title: 'Image Upload & Intake', input: 'Frontal & profile facial photos', output: 'Uploaded, validated images', tools: 'Gradio, FastAPI, OpenCV', models: '—', component: 'Frontend, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>', feasibility: '✅ Ready', backup: 'Gradio file uploader, basic checks', effort: '💪 Easy', phase: '✅ PoC', risk: '✅ On Track', feedback: 'A good, straightforward starting point. Using Gradio for the MVP is efficient.', recommendations: 'No changes needed. This is a low-risk, well-defined stage.' },
+            { stage: 2, title: 'Image Preprocessing', input: 'Raw images', output: 'Aligned, standardized images', tools: 'OpenCV, Pillow, SciPy, NumPy, face-alignment', models: '—', component: 'Backend, Model', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>', feasibility: '✅ Ready', backup: 'DECA auto-alignment fallback', effort: '⚙️ Moderate', phase: '✅ PoC', risk: '✅ On Track', feedback: 'Standard and necessary step. The use of face-alignment is appropriate.', recommendations: 'No changes needed. The "Moderate" effort assessment is accurate.' },
+            { stage: 3, title: 'Clinical Parameter Integration', input: 'Manual inputs or JSON (e.g., nasion, alar width)', output: 'Parameter schema mapped to facial regions', tools: 'JSON schema, Gradio/Streamlit sliders', models: '—', component: 'Frontend, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>', feasibility: '🟡 Needs Planning', backup: 'Use preset values or omit UI sliders', effort: '⚙️ Moderate', phase: '🧪 MVP', risk: '⚠️ Moderate Risk', feedback: 'The "Moderate" effort is an underestimation. Defining how clinical terms (e.g., "reduce dorsal hump") map to mesh regions is the core IP and requires significant planning and clinical input.', recommendations: 'Focus on a core set of 3-5 key parameters for the MVP. Instead of a complex schema, define parameters that translate directly to deformation actions (e.g., a "Nose Bridge Height" slider). This de-risks the stage and provides a clear development path.' },
+            { stage: 4, title: '3D Face Reconstruction', input: 'Aligned frontal/profile images', output: '3D face mesh (OBJ/PLY) + UV texture map', tools: 'PyTorch, PyTorch3D, FLAME, face-alignment, Trimesh', models: '✅ DECA (preferred), EMOCA, 3DMM-CNN', component: 'Model, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3m-9 9h18" /></svg>', feasibility: '✅ Solid', backup: '3DMM-CNN fallback', effort: '⚙️ Moderate', phase: '✅ PoC', risk: '✅ Excellent', feedback: 'Using DECA is a strong, well-supported choice that provides high-quality mesh and texture outputs.', recommendations: 'No changes needed. This is a core strength of the current plan.' },
+            { stage: 5, title: 'Mesh-Based Surgical Simulation', input: '3D mesh + surgical intent (text or param)', output: 'Modified 3D mesh (post-surgery simulation)', tools: 'PyTorch3D, CLIP, MeshCNN, latent vector ops', models: '✅ Text2Mesh, 🌀 3D-CODED, 🧠 Custom deformation models', component: 'Model, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>', feasibility: '🟡 Tricky but doable', backup: 'Parametric Deformation (PyTorch3D/Open3D)', effort: '🧱 Hard', phase: '✅ PoC (Basic), 🧪 MVP (Advanced)', risk: '🚨 High, But Conquerable', feedback: 'Keeps ambition alive while acknowledging hurdles—investors hear “difficult, not impossible,” surgeons hear “we’ll pilot on one feature first,” and PMs can plan sprints around clear gates.', recommendations: 'Focus on one flagship edit (e.g., dorsal-hump reduction for rhinoplasty) to prove realism quickly, then expand. The key is to run a tight R&D loop with surgeons in the room: prototype ➜ get a realism score ➜ refine ➜ lock the approach. This keeps momentum high, de-risks spooky “uncanny valley” artifacts, and prevents budget creep into full physics simulation before you have real traction.' },
+            { stage: 6, title: 'Texture Mapping & Enhancement', input: 'Base mesh (or scanned textures)', output: 'Realistic textured mesh', tools: 'PyTorch3D UV tools, Blender (optional), Neural Texture Projection', models: 'DECA (detail branch), UV completion GAN (optional)', component: 'Model, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>', feasibility: '✅ DECA provides UV map', backup: 'Use gray mesh or basic shading if needed', effort: '⚙️ Moderate', phase: '✅ PoC', risk: '✅ On Track', feedback: "DECA's ability to provide a UV map simplifies this process significantly.", recommendations: 'Leveraging the output from DECA is efficient.' },
+            { stage: 7, title: '3D Viewer (Before/After toggle)', input: 'Original + modified 3D mesh & texture', output: 'Interactive 3D viewer (rotate, zoom, compare)', tools: 'Three.js, React (future), Gradio (demo)', models: '—', component: 'Frontend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>', feasibility: '✅ Gradio supports Model3D', backup: 'Export .GLB + Sketchfab embed', effort: '💪 Easy', phase: '✅ PoC', risk: '✅ On Track', feedback: "Gradio's Model3D component is well-suited for a rapid MVP.", recommendations: 'No changes needed. The "Easy" effort estimation is appropriate.' },
+            { stage: 8, title: 'Before/After Comparison UX', input: 'Original + modified 3D mesh', output: 'Interactive side-by-side or slider view', tools: 'Gradio, Three.js', models: '—', component: 'Frontend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>', feasibility: '✅ Easy in Gradio', backup: 'Use side-by-side viewer or image comparison', effort: '💪 Easy', phase: '✅ PoC', risk: '✅ On Track', feedback: 'Gradio makes this straightforward for the MVP.', recommendations: 'No changes needed.' },
+            { stage: 9, title: 'Facial Measurement Analytics', input: 'Mesh geometry, measurements', output: 'Before/after comparisons, downloadable metrics', tools: 'SciPy, Pandas, Matplotlib/Plotly, JSON/CSV export', models: '—', component: 'Backend, Frontend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>', feasibility: '🟡 Needs clinical logic', backup: 'Add later using landmarks and ratios', effort: '⚙️ Moderate', phase: '🔁 Deferred', risk: '✅ Correctly Deferred', feedback: 'The clinical logic is complex and not essential for the core visualization MVP.', recommendations: 'Keep deferred. This can be a "fast follow" feature post-MVP.' },
+            { stage: 10, title: 'Exporting Mesh & Screenshots', input: 'Final simulated mesh', output: 'Exportable .OBJ, .GLTF, screenshots', tools: 'PyTorch3D I/O, GLTF export, Screenshot API', models: '—', component: 'Frontend, Backend', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>', feasibility: '✅ Straightforward', backup: 'Provide .OBJ + download link', effort: '💪 Easy', phase: '✅ PoC', risk: '✅ On Track', feedback: 'Straightforward and necessary for user utility.', recommendations: 'No changes needed.' },
+            { stage: 11, title: 'Infrastructure & GPU Hosting', input: 'App code, model weights', output: 'Live webapp with GPU support, secure uploads', tools: 'GCP/AWS, Docker, HTTPS, Vertex AI (optional), HIPAA/GDPR compliance', models: '—', component: 'Infra', icon: '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" /></svg>', feasibility: '🟡 Plan GPU access', backup: 'Use GCP, Colab, or run batch-mode', effort: '⚙️ Moderate', phase: '✅ PoC', risk: '⚠️ Potential Bottleneck', feedback: 'The note to "Plan GPU access" is critical. Model inference will be computationally expensive.', recommendations: 'Secure GPU resources immediately. Use a service like Google Colab Pro for development and plan the deployment on GCP/AWS early. Defer full HIPAA/GDPR compliance for the initial MVP if possible by using anonymized or non-patient data to reduce complexity.' },
         ];
 
         function createModelBadge(modelText) {
             const badges = { '✅': 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300', '🌀': 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300', '🧠': 'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300' };
             const emoji = modelText.trim().charAt(0);
             return badges[emoji] ? `<div class="inline-flex items-center"><span class="special-badge ${badges[emoji]}">${emoji}</span><span>${modelText.substring(1).trim()}</span></div>` : `<span>${modelText}</span>`;
+        }
+        
+        function createRiskBadge(riskText) {
+            const emoji = riskText.trim().charAt(0);
+            let colorClass = '';
+            if (emoji === '✅') {
+                colorClass = 'bg-green-100 text-green-800 dark:bg-green-900/60 dark:text-green-200';
+            } else if (emoji === '⚠️') {
+                colorClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-400/20 dark:text-yellow-200';
+            } else if (emoji === '🚨') {
+                colorClass = 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200';
+            }
+            return `<span class="risk-badge ${colorClass}">${riskText}</span>`;
         }
 
         function createPhaseTag(phaseText) {
@@ -191,6 +230,152 @@
             const modelsHtml = item.models.split(',').map(m => createModelBadge(m.trim())).join('<br>');
             const phaseHtml = createPhaseTag(item.phase);
             
+            let analysisSectionHtml;
+
+            if (item.stage === 3) {
+                analysisSectionHtml = `
+                    <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-t border-slate-200 dark:border-slate-800" data-stage-id="${item.stage}">
+                        <div class="border-b border-slate-200 dark:border-slate-700 mb-4">
+                            <nav class="-mb-px flex space-x-6 text-sm" aria-label="Tabs">
+                                <button class="tab-btn active-tab" data-tab="feasibility-${item.stage}">Feasibility Analysis</button>
+                                <button class="tab-btn" data-tab="recommendation-${item.stage}">Actionable Recommendation</button>
+                            </nav>
+                        </div>
+                        <div>
+                            <div id="feasibility-${item.stage}" class="tab-panel space-y-4 text-sm">
+                                <div>
+                                    <div class="font-semibold text-slate-800 dark:text-slate-200 mb-1">Risk Assessment</div>
+                                    ${createRiskBadge(item.risk)}
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-slate-800 dark:text-slate-200 mb-1">Feedback</div>
+                                    <p class="text-slate-600 dark:text-slate-300">${item.feedback}</p>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-slate-800 dark:text-slate-200 mb-1">Recommendations</div>
+                                    <p class="text-slate-600 dark:text-slate-300">${item.recommendations}</p>
+                                </div>
+                            </div>
+                            <div id="recommendation-${item.stage}" class="tab-panel hidden">
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full text-sm text-left">
+                                        <thead class="text-xs text-slate-500 dark:text-slate-400 uppercase">
+                                            <tr>
+                                                <th class="pb-2 font-semibold">Element</th>
+                                                <th class="pb-2 font-semibold">Why I see it differently</th>
+                                                <th class="pb-2 font-semibold">Actionable Recommendation</th>
+                                                <th class="pb-2 font-semibold">Success Indicator</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-200 dark:divide-slate-700 text-slate-600 dark:text-slate-300">
+                                            <tr>
+                                                <td class="py-3 pr-2 font-semibold text-slate-700 dark:text-slate-200">UI complexity</td>
+                                                <td class="py-3 pr-2">Building sliders / input widgets is commodity web work. Risk lies in getting clinical semantics right, not in coding.</td>
+                                                <td class="py-3 pr-2">Run a ½-day design workshop with two surgeons → draft JSON schema of adjustable parameters, units, ranges, and default values.</td>
+                                                <td class="py-3">Signed-off parameter schema + wireframes by Week 2 of PoC.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-3 pr-2 font-semibold text-slate-700 dark:text-slate-200">Scope creep</td>
+                                                <td class="py-3 pr-2">Report assumes every facial feature on day 1. A tighter MVP (e.g., rhinoplasty only) slashes moving parts.</td>
+                                                <td class="py-3 pr-2">Freeze scope to one procedure for PoC. Add toggle-flags in backlog for future zones (lips, chin, etc.).</td>
+                                                <td class="py-3">Change requests logged, not coded, during the 6-week PoC.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-3 pr-2 font-semibold text-slate-700 dark:text-slate-200">Validation burden</td>
+                                                <td class="py-3 pr-2">Surgeons panic when unfamiliar terms appear. Early involvement halves re-work.</td>
+                                                <td class="py-3 pr-2">Put a “clinical sign-off” checkpoint at the end of each sprint demo.</td>
+                                                <td class="py-3">&lt; 2 critical UI changes after Sprint 2.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (item.stage === 5) {
+                 analysisSectionHtml = `
+                    <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-t border-slate-200 dark:border-slate-800" data-stage-id="${item.stage}">
+                        <div class="border-b border-slate-200 dark:border-slate-700 mb-4">
+                            <nav class="-mb-px flex space-x-6 text-sm" aria-label="Tabs">
+                                <button class="tab-btn active-tab" data-tab="feasibility-${item.stage}">Feasibility Analysis</button>
+                                <button class="tab-btn" data-tab="recommendation-${item.stage}">Actionable Recommendation</button>
+                            </nav>
+                        </div>
+                        <div>
+                            <div id="feasibility-${item.stage}" class="tab-panel space-y-4 text-sm">
+                                <div>
+                                    <div class="font-semibold text-slate-800 dark:text-slate-200 mb-1">Risk Assessment</div>
+                                    ${createRiskBadge(item.risk)}
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-slate-800 dark:text-slate-200 mb-1">Feedback</div>
+                                    <p class="text-slate-600 dark:text-slate-300">${item.feedback}</p>
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-slate-800 dark:text-slate-200 mb-1">Recommendations</div>
+                                    <p class="text-slate-600 dark:text-slate-300">${item.recommendations}</p>
+                                </div>
+                            </div>
+                            <div id="recommendation-${item.stage}" class="tab-panel hidden">
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full text-sm text-left">
+                                        <thead class="text-xs text-slate-500 dark:text-slate-400 uppercase">
+                                            <tr>
+                                                <th class="pb-2 font-semibold">Concern in Report</th>
+                                                <th class="pb-2 font-semibold">My Counter-View</th>
+                                                <th class="pb-2 font-semibold">Mitigation Plan</th>
+                                                <th class="pb-2 font-semibold">Proof-of-Life Milestone</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-200 dark:divide-slate-700 text-slate-600 dark:text-slate-300">
+                                            <tr>
+                                                <td class="py-3 pr-2 font-semibold text-slate-700 dark:text-slate-200">“Text2Mesh needs massive paired data.”</td>
+                                                <td class="py-3 pr-2">True at broad scale, but you can bootstrap with 1 procedure, 1 edit type (dorsal-hump reduction) and a small, high-quality paired set.</td>
+                                                <td class="py-3 pr-2">1. Start with FFD-style control points on DECA mesh*.<br>2. Fine-tune Text2Mesh if paired data ≥ 100.<br>3. Blend displacement back into DECA output.</td>
+                                                <td class="py-3">Demo “before → after” nose morph on 5 selfie samples by Week 4.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-3 pr-2 font-semibold text-slate-700 dark:text-slate-200">“GAN artifacts will ruin trust.”</td>
+                                                <td class="py-3 pr-2">Keep edits conservative; pass final mesh through texture-refinement GAN and run a surgeon QA loop.</td>
+                                                <td class="py-3 pr-2">Recruit 3 surgeons for a rating study (1–5 realism). Retrain until ≥ 4 average.</td>
+                                                <td class="py-3">Realism score ≥ 4 by end of MVP sprint 3.</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-3 pr-2 font-semibold text-slate-700 dark:text-slate-200">“Physics-based tissue needed.”</td>
+                                                <td class="py-3 pr-2">Helpful later, not PoC-critical. Start with learned shape priors; log full FEM simulation as backlog for v2.</td>
+                                                <td class="py-3 pr-2"></td>
+                                                <td class="py-3"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                 analysisSectionHtml = `
+                    <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+                        <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Feasibility Analysis</h4>
+                        <div class="space-y-4 text-sm">
+                            <div>
+                                <div class="font-semibold text-slate-800 dark:text-slate-200 mb-1">Risk Assessment</div>
+                                ${createRiskBadge(item.risk)}
+                            </div>
+                            <div>
+                                <div class="font-semibold text-slate-800 dark:text-slate-200 mb-1">Feedback</div>
+                                <p class="text-slate-600 dark:text-slate-300">${item.feedback}</p>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-slate-800 dark:text-slate-200 mb-1">Recommendations</div>
+                                <p class="text-slate-600 dark:text-slate-300">${item.recommendations}</p>
+                            </div>
+                        </div>
+                    </div>
+                 `;
+            }
+
             const cardHtml = `
                 <div class="pipeline-item reveal" style="transition-delay: ${index * 100}ms;">
                     <div class="pipeline-line"></div>
@@ -205,12 +390,13 @@
                                 <div class="flex items-start"><span class="font-semibold text-slate-500 dark:text-slate-400 w-20">Models:</span><div class="flex-1">${modelsHtml}</div></div>
                             </div>
                         </div>
-                        <div class="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-t border-slate-200 dark:border-slate-700 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                        ${analysisSectionHtml}
+                        <div class="bg-white dark:bg-slate-900 px-6 py-4 border-t border-slate-200 dark:border-slate-700 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                             <div>
                                 <div class="font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">Feasibility</div>
                                 <div class="font-semibold text-slate-700 dark:text-slate-300">${item.feasibility}</div>
                             </div>
-                            <div>
+                             <div>
                                 <div class="font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">Effort</div>
                                 <div class="font-semibold text-slate-700 dark:text-slate-300">${item.effort}</div>
                             </div>
@@ -227,6 +413,30 @@
                 </div>
             `;
             pipelineContainer.innerHTML += cardHtml;
+        });
+
+        // Tab functionality
+        const tabContainers = document.querySelectorAll('[data-stage-id]');
+        tabContainers.forEach(container => {
+            const tabButtons = container.querySelectorAll('.tab-btn');
+            const tabPanels = container.querySelectorAll('.tab-panel');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active-tab'));
+                    button.classList.add('active-tab');
+                    
+                    const targetTabId = button.dataset.tab;
+                    
+                    tabPanels.forEach(panel => {
+                        if (panel.id === targetTabId) {
+                            panel.classList.remove('hidden');
+                        } else {
+                            panel.classList.add('hidden');
+                        }
+                    });
+                });
+            });
         });
 
         // Dark Mode Toggle
@@ -247,13 +457,17 @@
         
         // CSV Download
         document.getElementById('download-csv').addEventListener('click', () => {
-            const headers = ['Stage', 'Title', 'Feasibility', 'Backup Strategy', 'Effort', 'Phase', 'Input', 'Output', 'Tools', 'Models', 'Component'];
+            const headers = ['Stage', 'Title', 'Risk', 'Feedback', 'Recommendations', 'Feasibility', 'Backup Strategy', 'Effort', 'Phase', 'Input', 'Output', 'Tools', 'Models', 'Component'];
             const replacer = (key, value) => value === null ? '' : value;
             const csv = [
                 headers.join(','),
                 ...pipelineData.map(row => headers.map(fieldName => {
-                    const key = fieldName.toLowerCase().replace(' ', '');
-                    return JSON.stringify(row[key], replacer)
+                    const key = fieldName.toLowerCase().replace(/ & /g, '').replace(/ /g, '');
+                    let value = row[key];
+                    if (typeof value === 'string') {
+                        value = `"${value.replace(/"/g, '""')}"`;
+                    }
+                    return value;
                 }).join(','))
             ].join('\r\n');
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -261,7 +475,7 @@
             if (link.download !== undefined) {
                 const url = URL.createObjectURL(blob);
                 link.setAttribute('href', url);
-                link.setAttribute('download', 'TrueYou_Pipeline_Details.csv');
+                link.setAttribute('download', 'TrueYou_Pipeline_Feasibility_Report.csv');
                 link.style.visibility = 'hidden';
                 document.body.appendChild(link);
                 link.click();
@@ -274,7 +488,7 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) entry.target.classList.add('visible');
             });
-        }, { threshold: 0.1 });
+        }, { threshold: 0.05 });
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     </script>
 </body>
